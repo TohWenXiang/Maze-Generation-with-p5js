@@ -16,7 +16,8 @@
 
 /*
   Cell
-  - row, column
+  - row, column, cellwidth
+  - is this cell visited?
   - existance of its walls
 */
 class Cell {
@@ -24,40 +25,44 @@ class Cell {
     this.column = column;
     this.row = row;
     this.cellSize = cellSize;
+
     //top, right, bottom, left
     this.walls = [true, true, true, true];
+    this.visited = false;
+    
+    this.x1 = this.column * this.cellSize;
+    this.y1 = this.row * this.cellSize;
+    this.x2 = this.x1 + this.cellSize;
+    this.y2 = this.y1 + this.cellSize;
   }
 
-  draw() {
-    let x1 = this.column * this.cellSize;
-    let y1 = this.row * this.cellSize;
-    let x2 = x1 + this.cellSize;
-    let y2 = y1 + this.cellSize;
-    
+  draw() {    
     stroke(255);
 
     //top
     if(this.walls[0]) {
-      line(x1, y1, x2, y1);
+      line(this.x1, this.y1, this.x2, this.y1);
     }
 
     //right
     if(this.walls[1]) {
-      line(x2, y1, x2, y2);
+      line(this.x2, this.y1, this.x2, this.y2);
     }
 
     //bottom
     if(this.walls[2]) {
-      line(x1, y2, x2, y2);
+      line(this.x1, this.y2, this.x2, this.y2);
     }
 
     //left
     if(this.walls[3]) {
-      line(x1, y1, x1, y2);
+      line(this.x1, this.y1, this.x1, this.y2);
     }
 
-    //noFill();
-    //rect(x, y, this.cellSize, this.cellSize); 
+    if(this.visited){
+      fill(255, 0, 255, 100);
+      rect(this.x1, this.y1, this.cellSize, this.cellSize); 
+    }
 
   }
 }
@@ -86,6 +91,36 @@ class Grid {
     }
   }
 
+  getRandomUnvisitedNeighbour(c, r) {
+    let neighbour = [];
+
+    let topNeighbour = this.cells[Utility.ConvertToSingleDimensionalIndex(c, r - 1, this.columns, this.rows)];
+    let rightNeighbour = this.cells[Utility.ConvertToSingleDimensionalIndex(c + 1, r, this.columns, this.rows)];
+    let bottomNeighbour = this.cells[Utility.ConvertToSingleDimensionalIndex(c, r + 1, this.columns, this.rows)];
+    let leftNeighbour = this.cells[Utility.ConvertToSingleDimensionalIndex(c - 1, r, this.columns, this.rows)];
+
+    //check if neighbour have been visited
+    if(!topNeighbour?.visited) {
+      neighbour.push(topNeighbour);
+    }
+    if(!rightNeighbour?.visited) {
+      neighbour.push(rightNeighbour);
+    }
+    if(!bottomNeighbour?.visited) {
+      neighbour.push(bottomNeighbour);
+    }
+    if(!leftNeighbour?.visited) {
+      neighbour.push(leftNeighbour);
+    }
+
+    if(neighbour.length > 0) {
+      let index = floor(random(0, neighbour.length));
+      return neighbour[index];
+    } else {
+      return undefined;
+    }
+  }
+
   draw() {
     this.cells.forEach((cell) => {
       cell.draw();
@@ -93,11 +128,30 @@ class Grid {
   }
 }
 
+class MazeGen {
+  constructor(grid = new Grid()) {
+    //starts at the 0th cell
+    this.grid = grid;
+    this.current = this.grid.cells[0];
+  }
+
+  update() {
+    this.current.visited = true;
+    let next = this.grid.getRandomUnvisitedNeighbour(this.current.column, this.current.row);
+    if(next) {
+      next.visited = true;
+      this.current = next;
+    }
+  }
+}
+
 let grid;
+let mazeGen;
 
 function setup() {
   createCanvas(640, 360);
   grid = new Grid(width, height, 40);
+  mazeGen = new MazeGen(grid);
 }
 
 function mousePressed() {
@@ -106,5 +160,6 @@ function mousePressed() {
 
 function draw() {
   background(51);
+  mazeGen.update();
   grid.draw();
 }
