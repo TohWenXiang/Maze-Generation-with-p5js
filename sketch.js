@@ -155,6 +155,7 @@ class MazeGen {
     //starts at the 0th cell
     this.grid = grid;
     this.current = this.grid.cells[0];
+    this.stack = [];
   }
 
   update() {
@@ -167,11 +168,17 @@ class MazeGen {
       next.visited = true;
       next.color = color(0, 0, 255, 100);
 
+      //step 2: push the current cell to the stack
+      this.stack.push(this.current);
+
       //step 3: remove the wall between the current and choosen cell
       this.grid.removeWallsBetween(this.current, next);
 
       //step 4: set current cell as the next cell
       this.current = next;
+    } else if(this.stack.length > 0){
+      //if stack is not empty, pop the cell from the stack and make it current
+      this.current = this.stack.pop();
     }
   }
 }
@@ -181,9 +188,9 @@ let mazeGen;
 
 function setup() {
   createCanvas(640, 360);
-  grid = new Grid(width, height, 40);
+  grid = new Grid(width, height, 10);
   mazeGen = new MazeGen(grid);
-  frameRate(3);
+  //frameRate(3);
 }
 
 function mousePressed() {
