@@ -29,41 +29,43 @@ class Cell {
     //top, right, bottom, left
     this.walls = [true, true, true, true];
     this.visited = false;
-    
+
     this.x1 = this.column * this.cellSize;
     this.y1 = this.row * this.cellSize;
     this.x2 = this.x1 + this.cellSize;
     this.y2 = this.y1 + this.cellSize;
+
+    this.color = color(0, 0, 255, 100);
   }
 
-  draw() {    
+  draw() {
     stroke(255);
 
     //top
-    if(this.walls[0]) {
+    if (this.walls[0]) {
       line(this.x1, this.y1, this.x2, this.y1);
     }
 
     //right
-    if(this.walls[1]) {
+    if (this.walls[1]) {
       line(this.x2, this.y1, this.x2, this.y2);
     }
 
     //bottom
-    if(this.walls[2]) {
+    if (this.walls[2]) {
       line(this.x1, this.y2, this.x2, this.y2);
     }
 
     //left
-    if(this.walls[3]) {
+    if (this.walls[3]) {
       line(this.x1, this.y1, this.x1, this.y2);
     }
 
-    if(this.visited){
-      fill(255, 0, 255, 100);
-      rect(this.x1, this.y1, this.cellSize, this.cellSize); 
+    if (this.visited) {
+      noStroke();
+      fill(this.color);
+      rect(this.x1, this.y1, this.cellSize, this.cellSize);
     }
-
   }
 }
 
@@ -83,8 +85,8 @@ class Grid {
 
     this.cells = [];
 
-    for(let r = 0; r < this.rows; r++) {
-      for(let c = 0; c < this.columns; c++) {
+    for (let r = 0; r < this.rows; r++) {
+      for (let c = 0; c < this.columns; c++) {
         let cell = new Cell(c, r, this.cellSize);
         this.cells.push(cell);
       }
@@ -100,24 +102,44 @@ class Grid {
     let leftNeighbour = this.cells[Utility.ConvertToSingleDimensionalIndex(c - 1, r, this.columns, this.rows)];
 
     //check if neighbour have been visited
-    if(!topNeighbour?.visited) {
+    if (!topNeighbour?.visited) {
       neighbour.push(topNeighbour);
     }
-    if(!rightNeighbour?.visited) {
+    if (!rightNeighbour?.visited) {
       neighbour.push(rightNeighbour);
     }
-    if(!bottomNeighbour?.visited) {
+    if (!bottomNeighbour?.visited) {
       neighbour.push(bottomNeighbour);
     }
-    if(!leftNeighbour?.visited) {
+    if (!leftNeighbour?.visited) {
       neighbour.push(leftNeighbour);
     }
 
-    if(neighbour.length > 0) {
+    if (neighbour.length > 0) {
       let index = floor(random(0, neighbour.length));
       return neighbour[index];
     } else {
       return undefined;
+    }
+  }
+
+  removeWallsBetween(current, neighbour) {
+    let x = current.column - neighbour.column;
+    if(x === 1) {
+      current.walls[3] = false;
+      neighbour.walls[1] = false;
+    } else if(x === -1) {
+      current.walls[1] = false;
+      neighbour.walls[3] = false;
+    }
+
+    let y = current.row - neighbour.row;
+    if(y === 1) {
+      current.walls[0] = false;
+      neighbour.walls[2] = false;
+    } else if(y === -1) {
+      current.walls[2] = false;
+      neighbour.walls[0] = false;
     }
   }
 
@@ -137,9 +159,18 @@ class MazeGen {
 
   update() {
     this.current.visited = true;
+    this.current.color = color(255, 0, 0, 100);
+
+    //step 1: pick a random unvisited neighbour and mark it visited
     let next = this.grid.getRandomUnvisitedNeighbour(this.current.column, this.current.row);
-    if(next) {
+    if (next) {
       next.visited = true;
+      next.color = color(0, 0, 255, 100);
+
+      //step 3: remove the wall between the current and choosen cell
+      this.grid.removeWallsBetween(this.current, next);
+
+      //step 4: set current cell as the next cell
       this.current = next;
     }
   }
@@ -152,10 +183,11 @@ function setup() {
   createCanvas(640, 360);
   grid = new Grid(width, height, 40);
   mazeGen = new MazeGen(grid);
+  frameRate(3);
 }
 
 function mousePressed() {
-  
+
 }
 
 function draw() {
