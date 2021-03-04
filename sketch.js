@@ -104,24 +104,10 @@ class Grid {
     return neighbour;
   }
 
-  getRandomUnvisitedNeighbour(c, r) {
-    let unvisitedNeighbour = [];
-
-    let neighbour = this.getAdjacentNeighbour(c, r);    
-
-    //check if neighbour have been visited
-    if (!neighbour[0]?.visited) {
-      unvisitedNeighbour.push(neighbour[0]);
-    }
-    if (!neighbour[1]?.visited) {
-      unvisitedNeighbour.push(neighbour[1]);
-    }
-    if (!neighbour[2]?.visited) {
-      unvisitedNeighbour.push(neighbour[2]);
-    }
-    if (!neighbour[3]?.visited) {
-      unvisitedNeighbour.push(neighbour[3]);
-    }
+  getRandomUnvisitedAdjacentNeighbour(c, r) {
+    let unvisitedNeighbour = this.getAdjacentNeighbour(c, r).filter((cell) => {
+      return !cell?.visited;
+    });
 
     if (unvisitedNeighbour.length > 0) {
       let index = floor(random(0, unvisitedNeighbour.length));
@@ -171,7 +157,7 @@ class MazeGen {
     this.current.color = color(255, 0, 0, 100);
 
     //step 1: pick a random unvisited neighbour and mark it visited
-    let next = this.grid.getRandomUnvisitedNeighbour(this.current.column, this.current.row);
+    let next = this.grid.getRandomUnvisitedAdjacentNeighbour(this.current.column, this.current.row);
     if (next) {
       next.visited = true;
       next.color = color(0, 0, 255, 100);
