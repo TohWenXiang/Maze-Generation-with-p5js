@@ -12,7 +12,7 @@ class MazeGen {
     this.current.color = this.P5. color(255, 0, 0, 100);
 
     //step 1: pick a random unvisited neighbour and mark it visited
-    let next = this.grid.getRandomUnvisitedAdjacentNeighbour(this.current.column, this.current.row);
+    let next = this.P5.random(this.grid.getUnvisitedAdjacentNeighbour(this.current.column, this.current.row));
     if (next) {
       next.visited = true;
       next.color = this.P5.color(0, 0, 255, 100);

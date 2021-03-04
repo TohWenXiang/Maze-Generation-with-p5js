@@ -37,15 +37,8 @@ class Grid {
     return this.getCellsWithinWindow(c, r).filter((neighbour, index) => index % 2 === 1)
   }
 
-  getRandomUnvisitedAdjacentNeighbour(c, r) {
-    let unvisitedNeighbour = this.getAdjacentNeighbour(c, r).filter(cell => !cell?.visited);
-
-    if (unvisitedNeighbour.length > 0) {
-      let index = this.P5.floor(this.P5.random(0, unvisitedNeighbour.length));
-      return unvisitedNeighbour[index];
-    } else {
-      return undefined;
-    }
+  getUnvisitedAdjacentNeighbour(c, r) {
+    return this.getAdjacentNeighbour(c, r).filter(cell => !cell?.visited);
   }
 
   removeWallsBetween(current, neighbour) {
