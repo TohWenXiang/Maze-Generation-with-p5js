@@ -93,31 +93,39 @@ class Grid {
     }
   }
 
-  getRandomUnvisitedNeighbour(c, r) {
+  getAdjacentNeighbour(c = 0, r = 0) {
     let neighbour = [];
 
-    let topNeighbour = this.cells[Utility.ConvertToSingleDimensionalIndex(c, r - 1, this.columns, this.rows)];
-    let rightNeighbour = this.cells[Utility.ConvertToSingleDimensionalIndex(c + 1, r, this.columns, this.rows)];
-    let bottomNeighbour = this.cells[Utility.ConvertToSingleDimensionalIndex(c, r + 1, this.columns, this.rows)];
-    let leftNeighbour = this.cells[Utility.ConvertToSingleDimensionalIndex(c - 1, r, this.columns, this.rows)];
+    neighbour.push(this.cells[Utility.ConvertToSingleDimensionalIndex(c, r - 1, this.columns, this.rows)]);
+    neighbour.push(this.cells[Utility.ConvertToSingleDimensionalIndex(c + 1, r, this.columns, this.rows)]);
+    neighbour.push(this.cells[Utility.ConvertToSingleDimensionalIndex(c, r + 1, this.columns, this.rows)]);
+    neighbour.push(this.cells[Utility.ConvertToSingleDimensionalIndex(c - 1, r, this.columns, this.rows)]);
+
+    return neighbour;
+  }
+
+  getRandomUnvisitedNeighbour(c, r) {
+    let unvisitedNeighbour = [];
+
+    let neighbour = this.getAdjacentNeighbour(c, r);    
 
     //check if neighbour have been visited
-    if (!topNeighbour?.visited) {
-      neighbour.push(topNeighbour);
+    if (!neighbour[0]?.visited) {
+      unvisitedNeighbour.push(neighbour[0]);
     }
-    if (!rightNeighbour?.visited) {
-      neighbour.push(rightNeighbour);
+    if (!neighbour[1]?.visited) {
+      unvisitedNeighbour.push(neighbour[1]);
     }
-    if (!bottomNeighbour?.visited) {
-      neighbour.push(bottomNeighbour);
+    if (!neighbour[2]?.visited) {
+      unvisitedNeighbour.push(neighbour[2]);
     }
-    if (!leftNeighbour?.visited) {
-      neighbour.push(leftNeighbour);
+    if (!neighbour[3]?.visited) {
+      unvisitedNeighbour.push(neighbour[3]);
     }
 
-    if (neighbour.length > 0) {
-      let index = floor(random(0, neighbour.length));
-      return neighbour[index];
+    if (unvisitedNeighbour.length > 0) {
+      let index = floor(random(0, unvisitedNeighbour.length));
+      return unvisitedNeighbour[index];
     } else {
       return undefined;
     }
