@@ -93,21 +93,28 @@ class Grid {
     }
   }
 
-  getAdjacentNeighbour(c = 0, r = 0) {
+  /*
+    default: get all cells one block/radius out from (c, r) including the cell at (c, r)
+    eg. radius of 1 at (c, r) returns the 9 cells at (c, r)
+  */
+  getCellsWithinWindow(c = 0, r = 0, radius = 1) {
     let neighbour = [];
-
-    neighbour.push(this.cells[Utility.ConvertToSingleDimensionalIndex(c, r - 1, this.columns, this.rows)]);
-    neighbour.push(this.cells[Utility.ConvertToSingleDimensionalIndex(c + 1, r, this.columns, this.rows)]);
-    neighbour.push(this.cells[Utility.ConvertToSingleDimensionalIndex(c, r + 1, this.columns, this.rows)]);
-    neighbour.push(this.cells[Utility.ConvertToSingleDimensionalIndex(c - 1, r, this.columns, this.rows)]);
+    
+    for(let row = r - radius; row <= r + radius; row++) {
+      for(let column = c - radius; column <= c + radius; column++) {
+        neighbour.push(this.cells[Utility.ConvertToSingleDimensionalIndex(column, row, this.columns, this.rows)]);
+      }
+    }
 
     return neighbour;
   }
 
+  getAdjacentNeighbour(c = 0, r = 0) {
+    return this.getCellsWithinWindow(c, r).filter((neighbour, index) => index % 2 === 1)
+  }
+
   getRandomUnvisitedAdjacentNeighbour(c, r) {
-    let unvisitedNeighbour = this.getAdjacentNeighbour(c, r).filter((cell) => {
-      return !cell?.visited;
-    });
+    let unvisitedNeighbour = this.getAdjacentNeighbour(c, r).filter(cell => !cell?.visited);
 
     if (unvisitedNeighbour.length > 0) {
       let index = floor(random(0, unvisitedNeighbour.length));
