@@ -1,13 +1,23 @@
 class MazeGen {
-  constructor(P5, grid = new Grid()) {
+  constructor(P5, grid = new Grid(), startColumn, startRow) {
     this.P5 = P5;
     //starts at the 0th cell
     this.grid = grid;
-    this.current = this.grid.cells[0];
+    
+    this.startColumn = startColumn;
+    this.startRow = startRow;
+    
+    let randomIndex = Utility.ConvertToSingleDimensionalIndex(this.startColumn, this.startRow, this.grid.columns, this.grid.rows);
+    
+    this.current = this.grid.cells[randomIndex];
+    
     this.stack = [];
+    this.isFinished = false;
   }
 
   update() {
+    this.isFinished = (this.current.column === this. startColumn && this.current.row === this.startRow);
+    
     this.current.visited = true;
     this.current.color = this.P5. color(255, 0, 0, 100);
 

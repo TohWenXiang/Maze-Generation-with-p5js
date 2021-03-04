@@ -35,18 +35,25 @@
 let sketch = function(P5) {
   let grid;
   let mazeGen;
+  let debugX;
+  let fin;
   
   P5.setup = function() {
     P5.createCanvas(300, 300);
     grid = new Grid(P5, P5.width, P5.height, 15);
-    mazeGen = new MazeGen(P5, grid);
+    mazeGen = new MazeGen(P5, grid, P5.floor(P5.random(0, grid.columns)), P5.floor(P5.random(0, grid.rows)));
     //P5.frameRate(3);
+    const debugDiv = P5.createDiv();
+    debugX = P5.createSpan().parent(debugDiv);
+    fin = P5.createSpan().parent(debugDiv);
   };
   
   P5.draw = function() {
     P5.background(51);
     mazeGen.update();
     grid.draw();
+    debugX.html(`current: (${mazeGen.current.column}, ${mazeGen.current.row})`);
+    fin.html(`is finished: ${mazeGen.isFinished}`)
   };
 };
 
